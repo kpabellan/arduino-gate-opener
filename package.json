@@ -1,0 +1,20 @@
+{
+  "name": "arduino-gate-opener",
+  "version": "1.0.0",
+  "description": "A personal project that opens a gate with an Arduino. The way this works is I have a webpage which contains a button that sends a message to a websocket server. The websocket server then sends instructions for the servo on the Arduino and the servo then rotates to activate a click on the gate opener, allowing the gate to be opened remotely through a webpage.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "kpabellan",
+  "license": "MIT",
+  "dependencies": {
+    "arraybuffer-to-string": "^1.0.2",
+    "johnny-five": "^2.1.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v19.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kpabellan/arduino-gate-opener"
+  }
+}
