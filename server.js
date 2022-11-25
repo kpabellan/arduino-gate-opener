@@ -3,13 +3,13 @@ const uWS = require('uWebSockets.js');
 const abconv = require('arraybuffer-to-string');
 const axios = require('axios')
 const five = require('johnny-five');
-const {Servo} = require('johnny-five'); 
-const myBoard = new five.Board({port: 'COM4'});
-const delay = ms => new Promise(res => setTimeout(res, ms)); 
+const { Servo } = require('johnny-five');
+const myBoard = new five.Board({ port: 'COM4' });
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
-const websocketURL = ''; // Websocket URL
+const websocketURL = ''; // Websocket URL (example: wss://websocketurl/ws)
 const port = 3000; // Port
-const discordWebhook = '' // Discord Webhook URL
+const discordWebhook = '' // Discord Webhook URL (optional)
 
 function getTimeStamp() {
     let date = new Date();
@@ -18,13 +18,13 @@ function getTimeStamp() {
     let month1 = month0 + 1;
     let day = date.getDate();
     let timeLocal = date.toLocaleTimeString();
-    return 'TIME: ' + timeLocal + ' • DATE: ' + month1 + '/' + day + '/' + year ;
+    return 'TIME: ' + timeLocal + ' • DATE: ' + month1 + '/' + day + '/' + year;
 }
 
 function sendWebook() {
     let embed = [
         {
-        title: '[Gate Opened] - ' + getTimeStamp(),
+            title: '[Gate Opened] - ' + getTimeStamp(),
         }
     ];
 
@@ -35,13 +35,13 @@ function sendWebook() {
         url: discordWebhook,
         headers: { 'Content-Type': 'application/json' },
         data: data,
-     };
+    };
 
     axios(config)
-    .catch((error) => {
-        console.log(error);
-        return error;
-    });
+        .catch((error) => {
+            console.log(error);
+            return error;
+        });
 }
 
 myBoard.on('ready', function () {
