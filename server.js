@@ -1,14 +1,15 @@
 'use strict';
-const fs = require('fs');
 const uWS = require('uWebSockets.js');
 const abconv = require('arraybuffer-to-string');
+const axios = require('axios')
 const five = require('johnny-five');
 const {Servo} = require('johnny-five'); 
-const myBoard = new five.Board({port: 'COM3'});
+const myBoard = new five.Board({port: 'COM4'});
 const delay = ms => new Promise(res => setTimeout(res, ms)); 
 
 const websocketURL = ''; // Websocket URL
 const port = 3000; // Port
+const discordWebhook = '' // Discord Webhook URL
 
 function getTimeStamp() {
     let date = new Date();
@@ -17,7 +18,30 @@ function getTimeStamp() {
     let month1 = month0 + 1;
     let day = date.getDate();
     let timeLocal = date.toLocaleTimeString();
-    return 'DATE: ' + month1 + '/' + day + '/' + year + ', TIME: ' + timeLocal;
+    return 'TIME: ' + timeLocal + ' • DATE: ' + month1 + '/' + day + '/' + year ;
+}
+
+function sendWebook() {
+    let embed = [
+        {
+        title: '[Gate Opened] - ' + getTimeStamp(),
+        }
+    ];
+
+    let data = JSON.stringify({ embeds: embed });
+
+    var config = {
+        method: 'POST',
+        url: discordWebhook,
+        headers: { 'Content-Type': 'application/json' },
+        data: data,
+     };
+
+    axios(config)
+    .catch((error) => {
+        console.log(error);
+        return error;
+    });
 }
 
 myBoard.on('ready', function () {
@@ -30,26 +54,13 @@ myBoard.on('ready', function () {
             if (msg == 'open') {
                 async function openGate() {
                     await console.log('Opening gate...');
-                    let servo = new five.Servo({
-                        pin: 8
-                    });
+                    const servo = new Servo(8);
                     await servo.to(15);
                     await delay(1500);
                     await servo.to(80);
-                    await function getTimeStamp() {
-                        let date = new Date();
-                        let year = date.getFullYear();
-                        let month0 = date.getMonth();
-                        let month1 = month0 + 1;
-                        let day = date.getDate();
-                        let timeLocal = date.toLocaleTimeString();
-                        return 'DATE: ' + month1 + '/' + day + '/' + year + ', TIME: ' + timeLocal;
-                    }
-                    await fs.appendFile('timestamplog.txt', getTimeStamp() + '\n', err => {
-                        if (err) throw err;
-                    });
                 }
                 openGate();
+                sendWebook();
             }
         }
     }).any('/*', (res, req) => {
@@ -85,22 +96,27 @@ myBoard.on('ready', function () {
                         text-decoration: none;
                         line-height: 50px;
                         box-sizing: border-box;
-                        border-radius: 50px;
+                        border-radius: 25px;
                         background-color: transparent;
                         outline: none;
-                        transition: all ease 0.10s;
+                        transition: all ease 0.1s;
                     }
                     .active{
                         font-size: 0;
                         width: 100px;
                         height: 100px;
                         border-radius: 50%;
+                        border-bottom-color: transparent;
                         border-left-color: transparent;
-                        animation: rotate 1s ease 0.05s infinite;
+                        border-right-color: transparent;
+                        animation: rotate 1s ease 0.1s infinite;
                     }
                     @keyframes rotate{
-                        0%{
-                            transform: rotate(720deg);
+                        from {
+                            transform: rotate(0turn);
+                        }
+                        to {
+                            transform: rotate(1turn);
                         }
                     }
                     .footer{
@@ -129,12 +145,12 @@ myBoard.on('ready', function () {
                             $(this).addClass("active");
                             setTimeout(function() {
                                 $(".button").removeClass("active");
-                            }, 5000);
+                            }, 3000);
                         });
                     });
                     function websocketMessage() {
                         if ("WebSocket" in window) {
-                            var ws = new WebSocket("${websocketURL}");
+                            let ws = new WebSocket("${websocketURL}");
                             ws.onopen = function() {
                                 ws.send("open");
                             }
