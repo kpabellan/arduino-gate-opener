@@ -60,7 +60,9 @@ myBoard.on('ready', function () {
                     await servo.to(80);
                 }
                 openGate();
-                sendWebook();
+                if (discordWebhook != '') {
+                    sendWebook();
+                }
             }
         }
     }).any('/*', (res, req) => {
